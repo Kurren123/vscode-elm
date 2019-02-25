@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { SymbolInformation, TextDocument, DocumentSymbol } from 'vscode';
+import { SymbolInformation, SymbolKind, TextDocument, DocumentSymbol } from 'vscode';
 import { parseElmModule, Location } from 'elm-module-parser';
 import * as _ from 'lodash';
 
@@ -25,7 +25,7 @@ export function processDocument(doc: TextDocument): SymbolInformation[] {
         if (t.type === 'custom-type') {
           const constructorDefinition = new SymbolInformation(
             t.name,
-            vscode.SymbolKind.Class,
+            SymbolKind.Class,
             parsedModule.name,
             new vscode.Location(
               doc.uri,
@@ -37,7 +37,7 @@ export function processDocument(doc: TextDocument): SymbolInformation[] {
             .map(ctor => {
               return new SymbolInformation(
                 ctor.name,
-                vscode.SymbolKind.Constructor,
+                SymbolKind.Constructor,
                 parsedModule.name,
                 new vscode.Location(
                   doc.uri,
@@ -49,7 +49,7 @@ export function processDocument(doc: TextDocument): SymbolInformation[] {
         } else if (t.type === 'type-alias') {
           const typeAliasSymbol = new SymbolInformation(
             t.name,
-            vscode.SymbolKind.Class,
+            SymbolKind.Class,
             parsedModule.name,
             new vscode.Location(
               doc.uri,
@@ -68,7 +68,7 @@ export function processDocument(doc: TextDocument): SymbolInformation[] {
     const moduleFunctions = parsedModule.function_declarations.map(f => {
       return new SymbolInformation(
         f.name,
-        vscode.SymbolKind.Variable,
+        SymbolKind.Variable,
         parsedModule.name,
         new vscode.Location(
           doc.uri,
@@ -80,7 +80,7 @@ export function processDocument(doc: TextDocument): SymbolInformation[] {
     const portAnnotations = parsedModule.port_annotations.map(p => {
       return new SymbolInformation(
         p.name,
-        vscode.SymbolKind.Interface,
+        SymbolKind.Interface,
         parsedModule.name,
         new vscode.Location(
           doc.uri,
@@ -91,7 +91,7 @@ export function processDocument(doc: TextDocument): SymbolInformation[] {
 
     const moduleDefinition = new SymbolInformation(
       parsedModule.name,
-      vscode.SymbolKind.Module,
+      SymbolKind.Module,
       parsedModule.name,
       new vscode.Location(
         doc.uri,
@@ -118,7 +118,7 @@ export function getDocumentSymbols(doc: TextDocument): DocumentSymbol[] {
           const customTypeSymbol = new DocumentSymbol(
             t.name,
             "",
-            vscode.SymbolKind.Class,
+            SymbolKind.Class,
             locationToRange(t.location),
             locationToRange(t.location)
           );
@@ -128,7 +128,7 @@ export function getDocumentSymbols(doc: TextDocument): DocumentSymbol[] {
               new DocumentSymbol(
                 ctor.name,
                 "",
-                vscode.SymbolKind.Constructor,
+                SymbolKind.Constructor,
                 locationToRange(ctor.location),
                 locationToRange(ctor.location)
               )
@@ -141,7 +141,7 @@ export function getDocumentSymbols(doc: TextDocument): DocumentSymbol[] {
           const typeAliasSymbol = new DocumentSymbol(
             t.name,
             "",
-            vscode.SymbolKind.Class,
+            SymbolKind.Class,
             locationToRange(t.location),
             locationToRange(t.location),
           );
@@ -158,7 +158,7 @@ export function getDocumentSymbols(doc: TextDocument): DocumentSymbol[] {
       return new DocumentSymbol(
         f.name,
         "",
-        vscode.SymbolKind.Variable,
+        (f.parameters.length == 0 ? SymbolKind.Variable : SymbolKind.Function),
         locationToRange(f.location),
         locationToRange(f.location),
       );
@@ -168,7 +168,7 @@ export function getDocumentSymbols(doc: TextDocument): DocumentSymbol[] {
       return new DocumentSymbol(
         p.name,
         "",
-        vscode.SymbolKind.Interface,
+        SymbolKind.Interface,
         locationToRange(p.location),
         locationToRange(p.location)
       );
@@ -177,7 +177,7 @@ export function getDocumentSymbols(doc: TextDocument): DocumentSymbol[] {
     const moduleDefinition = new DocumentSymbol(
       parsedModule.name,
       "",
-      vscode.SymbolKind.Module,
+      SymbolKind.Module,
       locationToRange(parsedModule.location),
       locationToRange(parsedModule.location)
     );
